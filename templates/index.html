@@ -1,9 +1,7 @@
 <!doctype html>
-
 <html>
   <head>
     <title>Student Task Manager</title>
-
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
@@ -16,30 +14,21 @@
 
       <form action="/add" method="POST">
         <input type="text" name="task" placeholder="Enter Task" />
-
         <button type="submit">Add</button>
       </form>
 
       {% if error %}
-
       <p class="error">{{ error }}</p>
-
       {% endif %} {% for task in tasks %}
-
       <div class="card">
         {% if task.completed %}
-
-        <strike> {{ task.name }} </strike>
-
+        <strike>{{ task.name }}</strike>
         {% else %} {{ task.name }} {% endif %}
 
         <br /><br />
-
-        <a href="/complete/{{ loop.index0 }}"> Complete </a>
-
-        <a href="/delete/{{ loop.index0 }}"> Delete </a>
+        <a href="/complete/{{ loop.index0 }}">Complete</a>
+        <a href="/delete/{{ loop.index0 }}">Delete</a>
       </div>
-
       {% endfor %}
     </div>
   </body>
