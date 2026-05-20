@@ -1,4 +1,4 @@
-name: Flask CI/CD
+name: Flask DevOps Pipeline
 
 on:
   push:
@@ -22,9 +22,9 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run Test Cases
+      - name: Run Tests
         run: |
-          pytest
+          python -m pytest
 
   docker-build:
     needs: build-and-test
@@ -38,3 +38,41 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t student-task-manager .
+
+  deploy:
+    needs: docker-build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2 using SSH
+
+        uses: appleboy/ssh-action@master
+
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+
+          script: |
+
+            cd ~
+
+            if [ ! -d "student-task-manager" ]; then
+              git clone YOUR_GITHUB_REPO_URL
+            fi
+
+            cd student-task-manager
+
+            git pull origin master
+
+            sudo docker stop task-container || true
+
+            sudo docker rm task-container || true
+
+            sudo docker build -t student-task-manager .
+
+            sudo docker run -d \
+              -p 5000:5000 \
+              --name task-container \
+              student-task-manager
